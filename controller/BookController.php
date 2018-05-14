@@ -1,130 +1,120 @@
 <?php
 
+include 'model/Book.php';
+
 class BookController
 {
-	private $model = null;
 
-	function __construct($db)
-	{
-		include 'model/Book.php';
-		$this->model = new Book($db);
-	}
 
-	/**
-	 * Отображаем шаблон
-	 * @param $template
-	 * @param $params
-	 */
-	private function render($template, $params = [])
-	{
-		$fileTemplate = 'template/'.$template;
-		if (is_file($fileTemplate)) {
-			ob_start();
-			if (count($params) > 0) {
-				extract($params);
-			}
-			include $fileTemplate;
-			return ob_get_clean();
-		}
-	}
-
-	/**
-	 * Форма добавление книги
-	 * @param $params array
-	 * @return mixed
-	 */
-	function getAdd()
-	{
-		echo $this->render('book/add.php');
-	}
+    /**
+     * Получение всех книг
+     */
+    public function getList()
+    {
+        $book = new Book();
+        $books = $book->findAll();
+        Di::get()->render('book/list.php', ['books' => $books]);
+    }
 
 	/**
 	 * Добавление книги
-	 * @param $params array
-	 * @return mixed
 	 */
-	function postAdd($params, $post)
+	function add()
 	{
-		$updateParam = [];
-		if (isset($post['name']) && isset($post['author']) && isset($post['year']) && isset($post['genre'])) {
-			$idAdd = $this->model->add([
-				'name' => $post['name'],
-				'author' => $post['author'],
-				'year' => $post['year'],
-				'genre' => $post['genre'],
-			]);
-			if ($idAdd) {
-				header('Location: /');
-			}
-		}
-	}
+        $book = new Book();
+	    $errors = [];
+        if (count($_POST) > 0) {
+            $data = [];
+            if (isset($_POST['name']) && preg_match('/[A-zА-я\s]+/', $_POST['name'])) {
+                $data['name'] = $_POST['name'];
+            } else {
+                $errors['name'] = 'Error name';
+            }
+            if (isset($_POST['author']) && preg_match('/[A-zА-я\s]+/', $_POST['author'])) {
+                $data['author'] = $_POST['author'];
+            } else {
+                $errors['author'] = 'Error author';
+            }
+            if (isset($_POST['year']) && is_numeric($_POST['year'])) {
+                $data['year'] = $_POST['year'];
+            } else {
+                $errors['year'] = 'Error year';
+            }
+            if (isset($_POST['genre']) && preg_match('/[A-zА-я\s]+/', $_POST['author'])) {
+                $data['genre'] = $_POST['genre'];
+            } else {
+                $errors['genre'] = 'Error genre';
+            }
+            if (count($errors) == 0) {
+                $idAdd = $book->add($data);
+                if ($idAdd) {
+                    header('Location: /');
+                }
+            }
+        }
+
+        Di::get()->render('book/add.php');
+    }
 
 	/**
-	 * Удаление книги
-	 * @param $id
+	 * Редактирование данных
 	 */
-	public function getDelete($params)
+
+	public function update($params)
 	{
 		if (isset($params['id']) && is_numeric($params['id'])) {
-			$isDelete = $this->model->delete($params['id']);
-			if ($isDelete) {
-				header('Location: /');
-			}
+            $book = new Book();
+            $errors = [];
+            if (count($_POST) > 0) {
+                $data = [];
+                if (isset($_POST['name']) && preg_match('/[A-zА-я\s]+/', $_POST['name'])) {
+                    $data['name'] = $_POST['name'];
+                } else {
+                    $errors['name'] = 'Error name';
+                }
+                if (isset($_POST['author']) && preg_match('/[A-zА-я\s]+/', $_POST['author'])) {
+                    $data['author'] = $_POST['author'];
+                } else {
+                    $errors['author'] = 'Error author';
+                }
+
+                if (isset($_POST['year']) && is_numeric($_POST['year'])) {
+                    $data['year'] = $_POST['year'];
+                } else {
+                    $errors['year'] = 'Error year';
+                }
+                if (isset($_POST['genre']) && preg_match('/[A-zА-я\s]+/', $_POST['author'])) {
+                    $data['genre'] = $_POST['genre'];
+                } else {
+                    $errors['genre'] = 'Error genre';
+                }
+                if (count($errors) == 0) {
+                    $isUpdate = $book->update($params['id'], $data);
+                    if ($isUpdate) {
+                        header('Location: /');
+                    }
+                }
+            }
+			$bookData = $book->find($params['id']);
+			Di::get()->render('book/update.php', ['book' => $bookData, 'errors' => $errors]);
 		}
 	}
 
-	/**
-	 * Форма редактирование данных
-	 * @param $id
-	 */
+    /**
+     * Удаление книги
+     * @param $id
+     */
+    public function delete($params)
+    {
+        if (isset($params['id']) && is_numeric($params['id'])) {
+            $book = new Book();
+            $isDelete = $book->delete($params['id']);
+            if ($isDelete) {
+                header('Location: /');
+            }
+        }
+    }
 
-	public function getUpdate($params)
-	{
-		if (isset($params['id']) && is_numeric($params['id'])) {
-			$book = $this->model->find($params['id']);
-			echo $this->render('book/update.php', ['book' => $book]);
-		}
-	}
-
-
-	/**
-	 * Изменение данных о книге
-	 * @param $id
-	 */
-
-	public function postUpdate($params, $post)
-	{
-		if (isset($params['id']) && is_numeric($params['id'])) {
-			$updateParam = [];
-			if (isset($post['name'])) {
-				$updateParam['name'] = $post['name'];
-			}
-			if (isset($post['author'])) {
-				$updateParam['author'] = $post['author'];
-			}
-			if (isset($post['year']) && is_numeric($post['year'])) {
-				$updateParam['year'] = $post['year'];
-			}
-			if (isset($post['genre'])) {
-				$updateParam['genre'] = $post['genre'];
-			}
-			$isUpdate = $this->model->update($params['id'], $updateParam);
-
-			if ($isUpdate) {
-				header('Location: /');
-			}
-		}
-	}
-
-	/**
-	 * Получение всех книг
-	 * @return array
-	 */
-	public function getList()
-	{
-		$books = $this->model->findAll();
-		echo $this->render('book/list.php', ['books' => $books]);
-	}
 
 }
 

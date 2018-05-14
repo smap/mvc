@@ -4,19 +4,18 @@
  * Третий уровень понимания роутеров.
  * Уберём проверки файлов. Добавим настройки
  * Но помним, что многие вещи не реализованны
- * Пример урла: ?/book/update/
+ * Пример урла: /?r={controller}/{action}&{param1}={value1}&{param2}={value2}
+ * ?r=/book/update/id/(\d+)/&utm_sourсe=yandex
  */
 
 class Router
 {
 	private $dirConroller = '';
-	private $db = '';
 	private $urls = [];
 
-	function __construct($dirConroller, $db)
+	function __construct($dirConroller)
 	{
 		$this->dirConroller = $dirConroller;
-		$this->db = $db;
 	}
 
 	/**
@@ -69,7 +68,7 @@ class Router
 						$params[$param] = $matchList[$i];
 					}
 					include $this->dirConroller.$urlData['controller'].'.php';
-					$controller = new $urlData['controller']($this->db);
+					$controller = new $urlData['controller']();
 					if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 						$controller->$urlData['action']($params, $_POST);
 					} else {
@@ -81,7 +80,7 @@ class Router
 	}
 }
 
-$router = new Router('controller/', $db);
+$router = new Router('controller/');
 
 $router->get('/', 'BookController@getList');
 $router->get('/book/add/', 'BookController@getAdd');
@@ -95,7 +94,7 @@ $router->get('/book/delete/id/(\d+)/', 'BookController@getDelete', ['id' => 1]);
 /*
 Удаляем "/?", потому что не сделали настройки на серверах
  */
-$currentUrl = str_replace('/?', '', $_SERVER['REQUEST_URI']);
+$currentUrl = str_replace('/?r=', '', $_SERVER['REQUEST_URI']);
 
 /*
 Если добавить конфиг в

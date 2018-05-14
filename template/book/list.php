@@ -1,6 +1,10 @@
 <html>
 <body>
 <p><a href="?/book/add/">Добавить книгу</a></p>
+<?php foreach ($errors as $errorName => $errorValue) : ?>
+    <p><?= $errorValue?></p>
+<?php endforeach ?>
+
 <table border="1">
 	<?php foreach ($books as $book) : ?>
 		<tr>
