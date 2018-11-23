@@ -25,6 +25,12 @@ if (is_file($controllerFile)) {
         $controller = new $controllerText();
         if (method_exists($controller, $action)) {
             $controller->$action();
+        } else {
+            echo 404;
         }
+    } else {
+        echo 404;
     }
+} else {
+    echo 404;
 }

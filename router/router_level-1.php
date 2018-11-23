@@ -61,15 +61,15 @@ if ($controller == 'book') {
 
             if (count($errors) == 0) {
 
-                $sth = $db->prepare('UPDATE book SET name=:name, author=:author, year=:year, genre=:genre  WHERE id=:id');
-
+                $sth = $db->prepare('INSERT INTO book(name, author, year, genre) VALUES(:name, :author, :year, :genre)');
                 $sth->bindValue(':name', $_POST['name'], PDO::PARAM_STR);
                 $sth->bindValue(':author', $_POST['author'], PDO::PARAM_STR);
                 $sth->bindValue(':year', $_POST['year'], PDO::PARAM_INT);
                 $sth->bindValue(':genre', $_POST['genre'], PDO::PARAM_STR);
+                $sth->bindValue(':id', $_GET['id'], PDO::PARAM_INT);
 
                 if ($sth->execute()) {
-                    header('Location: index.php?c=book&a=list');
+                    header('Location: index.php');
                 } else {
                     $errors['global'] = 'Ошибка сохранения';
                 }
@@ -98,12 +98,12 @@ if ($controller == 'book') {
 
                 if (count($errors) == 0) {
 
-                    $sth = $db->prepare('INSERT INTO book(name, author, year, genre) VALUES(:name, :author, :year, :genre)');
+                    $sth = $db->prepare('UPDATE book SET name=:name, author=:author, year=:year, genre=:genre  WHERE id=:id');
+
                     $sth->bindValue(':name', $_POST['name'], PDO::PARAM_STR);
                     $sth->bindValue(':author', $_POST['author'], PDO::PARAM_STR);
                     $sth->bindValue(':year', $_POST['year'], PDO::PARAM_INT);
                     $sth->bindValue(':genre', $_POST['genre'], PDO::PARAM_STR);
-                    $sth->bindValue(':id', $_GET['id'], PDO::PARAM_INT);
 
                     if ($sth->execute()) {
                         header('Location: index.php?c=book&a=update&id=' . $_GET['id']);
@@ -122,7 +122,7 @@ if ($controller == 'book') {
             $sth = $db->prepare('DELETE FROM book WHERE id=:id');
             $sth->bindValue(':id', $_GET['id'], PDO::PARAM_INT);
             if ($sth->execute()) {
-                header('Location: index.php?c=book&a=list');
+                header('Location: index.php');
             } else {
                 $errors['global'] = 'Ошибка удаления';
                 include 'template/book/list.php';

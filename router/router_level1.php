@@ -21,11 +21,15 @@ if ($controller == 'book') {
     $bookController = new BookController();
     if ($action == 'list') {
         $bookController->getList();
+        //controllerBookList();
     } elseif ($action == 'add') {
         $bookController->add();
+        //controllerBookAdd();
     } elseif ($action == 'update') {
         $bookController->update();
+        //controllerBookUpdate();
     } elseif ($action == 'delete') {
          $bookController->delete();
+         //controllerBookDelete();
     }
 }

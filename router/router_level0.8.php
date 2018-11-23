@@ -49,10 +49,65 @@ if (! isset($_GET['c']) || ! isset($_GET['a'])) {
 
 if ($controller == 'book') {
     if ($action == 'list') {
-        $bookList = bookList();
-        render('/book/list.php');
-
+        controllerBookList();
     } elseif ($action == 'add') {
+        controllerBookAdd();
+    } elseif ($action == 'update') {
+         controllerBookUpdate();
+    } elseif ($action == 'delete') {
+        controllerBookDelete();
+    }
+}
+
+
+
+
+// КОНТРОЛЛЕР /controller/controllerBook.php:
+function controllerBookList()
+{
+    bookList();
+    render('/book/list.php');
+}
+
+function controllerBookAdd()
+{
+    if (count($_POST) > 0) {
+        $errors = [];
+        if (empty($_POST['name'])) {
+            $errors['name'] = 'Добавьте название';
+        }
+        if (empty($_POST['author'])) {
+            $errors['author'] = 'Добавьте автора';
+        }
+        if (empty($_POST['year'])) {
+            $errors['year'] = 'Добавьте год';
+        }
+        if (empty($_POST['genre'])) {
+            $errors['genre'] = 'Добавьте жанр';
+        }
+
+        if (count($errors) == 0) {
+
+            $isAdd = bookAdd([
+                'name' => $_POST['name'],
+                'author' => $_POST['author'],
+                'year' => $_POST['year'],
+                'genre' => $_POST['genre'],
+            ]);
+
+            if ($isAdd) {
+                header('Location: index.php');
+            }
+        }
+    }
+    render('/book/add.php');
+}
+
+function controllerBookUpdate()
+{
+    if (!isset($_GET['id']) && !is_numeric($_GET['id'])) {
+        render('/error/404.php');
+    } else {
         if (count($_POST) > 0) {
             $errors = [];
             if (empty($_POST['name'])) {
@@ -69,72 +124,35 @@ if ($controller == 'book') {
             }
 
             if (count($errors) == 0) {
-
-                $isAdd = bookAdd([
+                $isUpdate = bookUpdate($_GET['id'], [
                     'name' => $_POST['name'],
                     'author' => $_POST['author'],
                     'year' => $_POST['year'],
                     'genre' => $_POST['genre'],
                 ]);
 
-                if ($isAdd) {
-                    header('Location: index.php');
+                if ($isUpdate) {
+                    header('Location: index.php?c=book&a=update&id=' . $_GET['id']);
                 }
             }
         }
-        render('/book/add.php');
-
-    } elseif ($action == 'update') {
-        if (! isset($_GET['id']) && ! is_numeric($_GET['id'])) {
-            render('/error/404.php');
-        } else {
-            if (count($_POST) > 0) {
-                $errors = [];
-                if (empty($_POST['name'])) {
-                    $errors['name'] = 'Добавьте название';
-                }
-                if (empty($_POST['author'])) {
-                    $errors['author'] = 'Добавьте автора';
-                }
-                if (empty($_POST['year'])) {
-                    $errors['year'] = 'Добавьте год';
-                }
-                if (empty($_POST['genre'])) {
-                    $errors['genre'] = 'Добавьте жанр';
-                }
-
-                if (count($errors) == 0) {
-                    $isUpdate = bookUpdate($_GET['id'], [
-                        'name' => $_POST['name'],
-                        'author' => $_POST['author'],
-                        'year' => $_POST['year'],
-                        'genre' => $_POST['genre'],
-                    ]);
-
-                    if ($isUpdate) {
-                        header('Location: index.php?c=book&a=update&id=' . $_GET['id']);
-                    }
-                }
-            }
-
-            render('/book/update.php');
-        }
-    } elseif ($action == 'delete') {
-        if (! isset($_GET['id']) && ! is_numeric($_GET['id'])) {
-            render('/error/404.php');
-        } else {
-            if (bookDelete($_GET['id']) ) {
-                header('Location: index.php');
-            } else {
-                render('/book/list.php');
-            }
-        }
+        render('/book/update.php');
     }
 }
 
-
-
-// МОДЕЛЬ
+function controllerBookDelete()
+{
+    if (!isset($_GET['id']) && !is_numeric($_GET['id'])) {
+        render('/error/404.php');
+    } else {
+        if (bookDelete($_GET['id'])) {
+            header('Location: index.php');
+        } else {
+            render('/book/list.php');
+        }
+    }
+}
+// МОДЕЛЬ /model/Book.php:
 
 function bookList()
 {
