@@ -65,7 +65,7 @@ if ($controller == 'book') {
 // КОНТРОЛЛЕР /controller/controllerBook.php:
 function controllerBookList()
 {
-    bookList();
+    $bookList = bookList();
     render('/book/list.php');
 }
 
