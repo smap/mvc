@@ -31,11 +31,6 @@ function db()
     return $db;
 }
 
-// Представление
-function render($template)
-{
-    include 'template'.$template;
-}
 
 // КОНТРОЛЛЕР
 
@@ -66,7 +61,8 @@ if ($controller == 'book') {
 function controllerBookList()
 {
     $bookList = bookList();
-    render('/book/list.php');
+    // Представление
+    include 'template/book/list.php';
 }
 
 function controllerBookAdd()
@@ -100,7 +96,8 @@ function controllerBookAdd()
             }
         }
     }
-    render('/book/add.php');
+    // Представление
+    include 'template/book/add.php';
 }
 
 function controllerBookUpdate()
@@ -136,7 +133,8 @@ function controllerBookUpdate()
                 }
             }
         }
-        render('/book/update.php');
+        // Представление
+        include 'template/book/update.php';
     }
 }
 
@@ -148,7 +146,8 @@ function controllerBookDelete()
         if (bookDelete($_GET['id'])) {
             header('Location: index.php');
         } else {
-            render('/book/list.php');
+            // Представление
+            include 'template/book/list.php';
         }
     }
 }

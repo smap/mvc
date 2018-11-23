@@ -31,12 +31,6 @@ function db()
     return $db;
 }
 
-// Представление
-function render($template)
-{
-    include 'template'.$template;
-}
-
 // КОНТРОЛЛЕР
 
 if (! isset($_GET['c']) || ! isset($_GET['a'])) {
@@ -50,7 +44,7 @@ if (! isset($_GET['c']) || ! isset($_GET['a'])) {
 if ($controller == 'book') {
     if ($action == 'list') {
         $bookList = bookList();
-        render('/book/list.php');
+        include 'template/book/list.php';
 
     } elseif ($action == 'add') {
         if (count($_POST) > 0) {
@@ -82,7 +76,7 @@ if ($controller == 'book') {
                 }
             }
         }
-        render('/book/add.php');
+        include 'template/book/add.php';
 
     } elseif ($action == 'update') {
         if (! isset($_GET['id']) && ! is_numeric($_GET['id'])) {
@@ -117,7 +111,7 @@ if ($controller == 'book') {
                 }
             }
 
-            render('/book/update.php');
+            include 'template/book/update.php';
         }
     } elseif ($action == 'delete') {
         if (! isset($_GET['id']) && ! is_numeric($_GET['id'])) {
@@ -126,7 +120,7 @@ if ($controller == 'book') {
             if (bookDelete($_GET['id']) ) {
                 header('Location: index.php');
             } else {
-                render('/book/list.php');
+                include 'template/book/list.php';
             }
         }
     }

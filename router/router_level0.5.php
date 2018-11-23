@@ -31,12 +31,6 @@ function db()
     return $db;
 }
 
-// Представление
-function render($template)
-{
-    include 'template'.$template;
-}
-
 // КОНТРОЛЛЕР
 
 if (! isset($_GET['c']) || ! isset($_GET['a'])) {
@@ -52,7 +46,8 @@ if ($controller == 'book') {
         function controllerBookList()
         {
             $bookList = bookList();
-            render('/book/list.php');
+            // Представление
+            include 'template/book/list.php';
         }
 
 
@@ -88,7 +83,9 @@ if ($controller == 'book') {
                     }
                 }
             }
-            render('/book/add.php');
+
+            // Представление
+            include 'template/book/add.php';
         }
         controllerBookAdd();
     } elseif ($action == 'update') {
@@ -125,7 +122,8 @@ if ($controller == 'book') {
                         }
                     }
                 }
-                render('/book/update.php');
+                // Представление
+                include 'template/book/update.php';
             }
         }
         controllerBookUpdate();
@@ -139,7 +137,8 @@ if ($controller == 'book') {
                 if (bookDelete($_GET['id'])) {
                     header('Location: index.php');
                 } else {
-                    render('/book/list.php');
+                    // Представление
+                    include 'template/book/index.php';
                 }
             }
         }
